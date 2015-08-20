@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>NW Fires</title>
+
+		<!-- JQuery CDN -->
+		<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+
+		<!-- Leaflet CDN -->
+		<link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+
+		<!-- esri-leaflet CDN -->
+		<script src="//cdn.jsdelivr.net/leaflet.esri/1.0.0/esri-leaflet.js"></script>
+
+		<style type="text/css">
+			a {
+				text-decoration: none;
+				color: #00f;
+			}
+
+			body {
+				padding: 0;
+				margin: 0;
+			}
+
+			html, body {
+				height: 100%;
+				width: 100%;
+			}
+
+			#map {
+				width: 100%;
+				height: 100%;
+			}
+
+			#banner {
+				position: absolute;
+				z-index: 1;
+				padding: 10px;
+				background-color: #fff;
+			}
+
+			.leaflet-top {
+				margin-top: 100px;
+			}
+		</style>
+
+		<script type="text/javascript">
+			$(document).ready(function() {
+				var map = L.map('map').setView([48.25, -119.5], 10);
+				L.esri.basemapLayer('Imagery').addTo(map);
+				L.esri.basemapLayer('ImageryLabels').addTo(map);
+
+				L.esri.featureLayer({
+					url: 'http://services.arcgis.com/uUvqNMGPm7axC2dD/ArcGIS/rest/services/Daily_Layers/FeatureServer/2',
+					style: function(feature, layer) {
+						return {
+							color: '#f00'
+						};
+					}
+				}).addTo(map);
+
+				// Set to current location if within Eastern WA
+				if (navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function(position) {
+						if (
+							position.coords.latitude < 49 && position.coords.latitude > 45.5 &&
+							position.coords.longitude > -122 && position.coords.longitude < -116.6
+						) {
+							console.log('Zooming to current location...');
+							map.setView([position.coords.latitude, position.coords.longitude], 12);
+						}
+						else {
+							console.log('Not zooming to current location...');
+						}
+					});
+				}
+			});
+		</script>
+	<body>
+		<div id="banner">
+			<strong>IMPORTANT:</strong> This website displays daily fire perimeter information available provided by
+			<a href="http://gacc.nifc.gov/nwcc/information/firemap.aspx">NWCC</a>. Fire conditions change rapidly, and
+			information here may be inaccurate or out of date. You should not rely on this map to make evacuation
+			decisions. Please monitor local resources and pay attention to your surroundings.
+		</div>
+		<div id="map"></div>
+	</body>
+</html>
